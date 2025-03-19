@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Question{% endblock %}
+
+{% block content %}
+    <h2>Edit Question</h2>
+    <form method="POST">
+        <div>
+            <label for="question">Question:</label>
+            <input type="text" id="question" name="question" value="{{ question.text }}" required>
+        </div>
+        <div>
+            <label for="options">Options (comma-separated):</label>
+            <input type="text" id="options" name="options" value="{{ question.options }}" required>
+        </div>
+        <div>
+            <label for="correct_answer">Correct Answer:</label>
+            <input type="text" id="correct_answer" name="correct_answer" value="{{ question.correct_answer }}" required>
+        </div>
+        <button type="submit">Update Question</button>
+    </form>
+{% endblock %}
