@@ -12,9 +12,11 @@ jobs:
           docker_layer_caching: true
 
       - run: |
-          docker build -t $DOCKER_USERNAME/quiz-app .
+          docker build -t quiz-app:latest .
+          docker tag quiz-app:latest $DOCKER_USERNAME/quiz-app:latest
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-          docker push $DOCKER_USERNAME/quiz-app
+          docker push $DOCKER_USERNAME/quiz-app:latest
+
 
 workflows:
   build-and-deploy:
