@@ -26,6 +26,7 @@ class TestQuizApp(unittest.TestCase):
         db.session.add(self.question)
         db.session.commit()
     
+    
     def tearDown(self):
         with self.app.app_context():
             db.session.remove()
