@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy the requirements file
 COPY requirements.txt .
@@ -20,4 +20,4 @@ EXPOSE 5000
 ENV NAME=World
 
 # Run app.py when the container launches
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["python", "run.py"]
