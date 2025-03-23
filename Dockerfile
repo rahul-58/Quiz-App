@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.12-slim-buster
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -13,11 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
-# Make port 5000 available to the world outside this container
+# Expose port 5000 for the Flask app
 EXPOSE 5000
 
-# Define environment variable
-ENV NAME=World
-
-# Run app.py when the container launches
-CMD ["python", "run.py"]
+# Run the application
+CMD ["python", "/usr/src/app/run.py"]
