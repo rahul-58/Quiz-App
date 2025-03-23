@@ -73,5 +73,6 @@ class TestQuizApp(unittest.TestCase):
             response = client.get('/take_quiz/1')
             self.assertEqual(response.status_code, 200)
 
+
 if __name__ == '__main__':
     unittest.main()
