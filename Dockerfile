@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /usr/src
 
 # Copy the requirements file
 COPY requirements.txt .
