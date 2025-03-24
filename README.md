@@ -8,8 +8,8 @@ This is a simple web application built using Python Flask. The app allows users 
 -	**Recent Scores**: Users can view their recent quiz scores on the dashboard.
 
 ## API Endpoints:
-- **GET /login**: Login page for users.
 - **GET /register**: Registration page for new users.
+- **GET /login**: Login page for existing users.
 - **GET /dashboard**: User dashboard to view quizzes and recent scores.
 -	**GET /create_quiz**: Create a new quiz.
 -	**GET /manage_quiz/int:quiz_id**: Manage a specific quiz.
@@ -51,6 +51,7 @@ The application architecture includes an EC2 instance running a Docker container
 - **Route**: `/register`
 - **Method**: `POST`
 - **Form Data**: `username`, `email`, `password`
+- **Validation"": Ensure that `username`, `email`, and `password` are not empty. 
 - **Password Hashing**: Use `Flask-Bcrypt` to securely hash the password.
 
 ### **User Login**
@@ -59,3 +60,44 @@ The application architecture includes an EC2 instance running a Docker container
 - **Form Data**: `username`, `password`
 - **Validation**: Ensure that `username` and `password` are not empty.
 - **Authentication**: Use `Flask-Login` to authenticate users.
+
+### **Dashboard** (`/dashboard`)
+- **Route**: `/dashboard`
+- **Method**: `GET`
+- **Functionality**: Display a list of quizzes created by the user.
+- **Validation**: Ensure that the user is logged in.
+- **Database Queries**: Fetch quizzes created by the current user.
+
+### **Creating a Quiz**
+- **Route**: `/create_quiz`
+- **Method**: `POST`
+- **Form Data**: `title`, `questions` (list of question objects)
+- **Validation**: Ensure that `title` is not empty. Validate each question for correctness.
+
+### **Manage Quiz** (`/manage_quiz/<int:quiz_id>`)
+- **Route**: `/manage_quiz/<int:quiz_id>`
+- **Method**: `GET`, `POST`
+- **Functionality**: Display quiz details, add new questions, and manage existing questions.
+- **Validation**: Ensure that the quiz ID exists and the user has permission to manage it.
+- **Database Queries**: Fetch quiz details and questions from the database.
+
+### **Taking a Quiz**
+- **Route**: `/take_quiz/<int:quiz_id>`
+- **Method**: `GET`, `POST`
+- **Form Data**: `answers` (list of answer IDs)
+- **Validation**: Ensure that each question has an answer selected.
+- **Scoring**: Calculate score based on correct answers.
+
+### **Edit Question** (`/edit_question/<int:question_id>`)
+- **Route**: `/edit_question/<int:question_id>`
+- **Method**: `GET`, `POST`
+- **Functionality**: Edit an existing question.
+- **Validation**: Ensure that the question ID exists and the user has permission to edit it.
+- **Database Queries**: Fetch the question from the database and update it.
+
+### **Remove Question** (`/remove_question/<int:question_id>`)
+- **Route**: `/remove_question/<int:question_id>`
+- **Method**: `POST`
+- **Functionality**: Delete a question.
+- **Validation**: Ensure that the question ID exists and the user has permission to delete it.
+- **Database Queries**: Delete the question from the database.
