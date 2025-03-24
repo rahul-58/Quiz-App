@@ -1,4 +1,3 @@
-Quiz App
 This is a simple web application built using Python Flask. The app allows users to take, create, and manage their quizzes. Users can log in, take quizzes, and view their scores.
 
 Features
