@@ -14,12 +14,13 @@ This is a simple web application built using Python Flask. The app allows users 
 -	**GET /create_quiz**: Create a new quiz.
 -	**GET /manage_quiz/int:quiz_id**: Manage a specific quiz.
 -	**GET /take_quiz/int:quiz_id**: Take a specific quiz.
--	**GET /quiz_result**: View quiz results after submission.
+-	**GET /edit_question/<int:question_id>**: Edit a specific question.
+-	**GET /remove_question/<int:question_id>**: Remove a specific question.
 
 ## Software Stack:
 - **Backend Framework**: Flask
 - **Database ORM**: Flask-SQLAlchemy
-- **CI/CD Tool**: CircleCI
+- **CI Tool**: CircleCI
 - **Containerization**: Docker
 - **Cloud Platform**: AWS
 
@@ -31,19 +32,15 @@ This is a simple web application built using Python Flask. The app allows users 
 - Flask-WTF
 - email-validator
 
-## Database Design
+## Database Design:
 The application uses Flask-SQLAlchemy to manage a database with tables for User, Quiz, Question, Answer, and QuizResult.
 
-## Security Measures
+## Security Measures:
 - **Authentication**: Flask-Login is used for user authentication.
 - **Password Hashing**: Secure password hashing protects user credentials.
 
-## Deployment
-The application is deployed on AWS using Docker containers. CircleCI handles continuous integration and deployment.
+## Deployment:
+The application is deployed on AWS using Docker containers. CircleCI handles continuous integration.
 
 ## Architecture
 The application architecture includes an EC2 instance running a Docker container with the Flask app, connected to an RDS database.
-
-## Usage
-1. **Create a Quiz**: Users can create quizzes by providing a title and adding questions.
-2. **Take a Quiz**: Users can take quizzes and view their scores.
