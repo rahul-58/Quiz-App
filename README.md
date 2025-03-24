@@ -44,3 +44,17 @@ The application is deployed on AWS using Docker containers. CircleCI handles con
 
 ## Architecture
 The application architecture includes an EC2 instance running a Docker container with the Flask app, connected to an RDS database.
+
+## Implementation Details:
+- **User Registration**:
+    Route: /register
+    Method: POST
+    Form Data: username, email, password
+    Password Hashing: Use Flask-Bcrypt to securely hash the password.
+
+- **User Login**
+    Route: /login
+    Method: POST
+    Form Data: username, password
+    Validation: Ensure that username and password are not empty.
+    Authentication: Use Flask-Login to authenticate users.
