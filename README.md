@@ -51,7 +51,7 @@ The application architecture includes an EC2 instance running a Docker container
 - **Route**: `/register`
 - **Method**: `POST`
 - **Form Data**: `username`, `email`, `password`
-- **Validation"": Ensure that `username`, `email`, and `password` are not empty. 
+- **Validation**: Ensure that `username`, `email`, and `password` are not empty. 
 - **Password Hashing**: Use `Flask-Bcrypt` to securely hash the password.
 
 ### **User Login**
