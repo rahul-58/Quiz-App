@@ -4,8 +4,13 @@ from flask_login import login_required, current_user
 
 bp = Blueprint('main', __name__)
 
-# call index.html
+# Public landing page
 @bp.route('/')
+def landing():
+    return render_template('landing.html')
+
+# call index.html
+@bp.route('/quizzes')
 @login_required
 def index():
     quizzes = Quiz.query.all()

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Email, Length, EqualTo
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -23,3 +23,9 @@ class QuestionForm(FlaskForm):
     options = TextAreaField('Options (comma-separated)', validators=[DataRequired()])
     correct_answer = StringField('Correct Answer', validators=[DataRequired()])
     submit = SubmitField('Add Question')
+    
+    def validate_correct_answer(self, field):
+        if self.options.data and field.data:
+            options_list = [opt.strip() for opt in self.options.data.split(',')]
+            if field.data not in options_list:
+                raise ValidationError('Correct answer must be one of the options provided.')
