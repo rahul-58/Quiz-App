@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Quiz App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Welcome to Quiz App</h1>
+            <p class="lead mb-4">Create, take, and manage quizzes with ease. Join our community of quiz enthusiasts!</p>
+            
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Create Quizzes</h5>
+                            <p class="card-text">Design your own quizzes with multiple choice questions and share them with others.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Take Quizzes</h5>
+                            <p class="card-text">Test your knowledge by taking quizzes created by the community.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg me-3">View Quizzes</a>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary btn-lg">Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg me-3">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

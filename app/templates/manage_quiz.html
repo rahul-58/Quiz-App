@@ -21,6 +21,7 @@
             <div class="mb-3">
                 {{ form.correct_answer.label(class="form-label") }}
                 {{ form.correct_answer(class="form-control") }}
+                <small class="form-text text-muted">Must be exactly one of the options listed above</small>
             </div>
             {{ form.submit(class="btn btn-primary") }}
         </form>
@@ -43,14 +44,12 @@
     </div>
 </div>
 
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editModalLabel">Edit Question</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editQuestionForm">
@@ -66,6 +65,7 @@
                     <div class="mb-3">
                         <label for="editCorrectAnswer" class="form-label">Correct Answer:</label>
                         <input type="text" class="form-control" id="editCorrectAnswer" name="correct_answer">
+                        <small class="form-text text-muted">Must be exactly one of the options listed above</small>
                     </div>
                 </form>
             </div>
@@ -77,67 +77,112 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-    $(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    let currentQuestionId = null;
 
-        $('.edit-question').on('click', function() {
-            var questionId = $(this).data('id');
-            var questionText = $(this).data('question');
-            var options = $(this).data('options');
-            var correctAnswer = $(this).data('correct-answer');
+    // Edit question functionality
+    document.querySelectorAll('.edit-question').forEach(function(button) {
+        button.addEventListener('click', function() {
+            console.log('Edit button clicked');
+            const questionId = this.getAttribute('data-id');
+            const questionText = this.getAttribute('data-question');
+            const options = this.getAttribute('data-options');
+            const correctAnswer = this.getAttribute('data-correct-answer');
 
-            $('#editQuestion').val(questionText);
-            $('#editOptions').val(options);
-            $('#editCorrectAnswer').val(correctAnswer);
+            console.log('Question data:', { questionId, questionText, options, correctAnswer });
 
-            $('#editModal').modal('show');
-
-            $('#saveEdit').on('click', function() {
-                var newQuestion = $('#editQuestion').val();
-                var newOptions = $('#editOptions').val();
-                var newCorrectAnswer = $('#editCorrectAnswer').val();
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/edit_question_ajax',
-                    data: {
-                        question_id: questionId,
-                        question: newQuestion,
-                        options: newOptions,
-                        correct_answer: newCorrectAnswer
-                    },
-                    success: function(data) {
-                        location.reload();
-                    }
-                });
-            });
-        });
-
-        $('.delete-question').on('click', function() {
-        var questionId = $(this).data('id');
-        if (confirm("Are you sure you want to delete this question?")) {
-            $.ajax({
-                type: 'POST',
-                url: '/remove_question_ajax',
-                data: {
-                    question_id: questionId
-                },
-                success: function(data) {
-                    console.log('Question deleted successfully:', data);
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error deleting question:', error);
-                    console.log('Status:', status);
-                    console.log('XHR:', xhr.responseText);
-                }
-            });
-        }
+            document.getElementById('editQuestion').value = questionText;
+            document.getElementById('editOptions').value = options;
+            document.getElementById('editCorrectAnswer').value = correctAnswer;
+            
+            currentQuestionId = questionId;
+            editModal.show();
         });
     });
 
+    // Save edit functionality
+    document.getElementById('saveEdit').addEventListener('click', function() {
+        const newQuestion = document.getElementById('editQuestion').value;
+        const newOptions = document.getElementById('editOptions').value;
+        const newCorrectAnswer = document.getElementById('editCorrectAnswer').value;
+
+        // Client-side validation
+        const optionsList = newOptions.split(',').map(opt => opt.trim());
+        if (!optionsList.includes(newCorrectAnswer)) {
+            alert('Correct answer must be one of the options provided.');
+            return;
+        }
+
+        fetch('/edit_question_ajax', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                question_id: currentQuestionId,
+                question: newQuestion,
+                options: newOptions,
+                correct_answer: newCorrectAnswer
+            })
+        })
+        .then(response => {
+            console.log('Edit response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Edit response data:', data);
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+                // Don't close modal on error so user can fix the issue
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error editing question: ' + error.message);
+        });
+    });
+
+    // Delete question functionality
+    document.querySelectorAll('.delete-question').forEach(function(button) {
+        button.addEventListener('click', function() {
+            console.log('Delete button clicked');
+            const questionId = this.getAttribute('data-id');
+            console.log('Question ID to delete:', questionId);
+            
+            if (confirm("Are you sure you want to delete this question?")) {
+                fetch('/remove_question_ajax', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        question_id: questionId
+                    })
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting question: ' + error.message);
+                });
+            }
+        });
+    });
+});
 </script>
 
 {% endblock %}

@@ -25,22 +25,25 @@ def create_quiz():
 @login_required
 def manage_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
+    
+    # Check if the user owns the quiz
+    if quiz.user_id != current_user.id:
+        flash('You can only manage your own quizzes.', 'danger')
+        return redirect(url_for('main.index'))
+    
     form = QuestionForm()
     if form.validate_on_submit():
         options_list = [opt.strip() for opt in form.options.data.split(',')]
-        if form.correct_answer.data not in options_list:
-            flash("Correct answer must be one of the options.", "danger")
-        else:
-            new_question = Question(
-                text=form.question.data,
-                options=','.join(options_list),
-                correct_answer=form.correct_answer.data,
-                quiz_id=quiz.id,
-            )
-            db.session.add(new_question)
-            db.session.commit()
-            flash("Question added successfully!", "success")
-            return redirect(url_for('quiz.manage_quiz', quiz_id=quiz.id))
+        new_question = Question(
+            text=form.question.data,
+            options=','.join(options_list),
+            correct_answer=form.correct_answer.data,
+            quiz_id=quiz.id,
+        )
+        db.session.add(new_question)
+        db.session.commit()
+        flash("Question added successfully!", "success")
+        return redirect(url_for('quiz.manage_quiz', quiz_id=quiz.id))
     
     return render_template('manage_quiz.html', quiz=quiz, form=form)
 
@@ -73,6 +76,7 @@ def remove_question(question_id):
 
 # Allows the user to take quiz
 @bp.route('/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
 def take_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     
@@ -98,25 +102,47 @@ def take_quiz(quiz_id):
 @bp.route('/edit_question_ajax', methods=['POST'])
 @login_required
 def edit_question_ajax():
-    question_id = request.form['question_id']
-    question = Question.query.get_or_404(question_id)
-    question.text = request.form['question']
-    question.options = request.form['options']
-    question.correct_answer = request.form['correct_answer']
-    
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        question_id = request.form['question_id']
+        question = Question.query.get_or_404(question_id)
+        
+        # Check if the user owns the quiz
+        if question.quiz.user_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+        
+        # Validate that correct answer is one of the options
+        options_list = [opt.strip() for opt in request.form['options'].split(',')]
+        if request.form['correct_answer'] not in options_list:
+            return jsonify({'success': False, 'error': 'Correct answer must be one of the options'}), 400
+        
+        question.text = request.form['question']
+        question.options = request.form['options']
+        question.correct_answer = request.form['correct_answer']
+        
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # Allows the user to remove question
 @bp.route('/remove_question_ajax', methods=['POST'])
 @login_required
 def remove_question_ajax():
-    question_id = request.form['question_id']
-    question = Question.query.get_or_404(question_id)
-    
-    UserAnswer.query.filter_by(question_id=question_id).delete()
-    
-    db.session.delete(question)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        question_id = request.form['question_id']
+        question = Question.query.get_or_404(question_id)
+        
+        # Check if the user owns the quiz
+        if question.quiz.user_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+        
+        UserAnswer.query.filter_by(question_id=question_id).delete()
+        
+        db.session.delete(question)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500

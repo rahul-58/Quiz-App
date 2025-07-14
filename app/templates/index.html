@@ -13,7 +13,10 @@
                     <p class="card-text">Number of questions: {{ quiz.questions|length }}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            <a href="{{ url_for('quiz.take_quiz', quiz_id=quiz.id) }}" class="btn btn-sm btn-success">Take Quiz</a>
+                            <a href="{{ url_for('quiz.take_quiz', quiz_id=quiz.id) }}" class="btn btn-sm btn-success me-2">Take Quiz</a>
+                            {% if current_user.id == quiz.user_id %}
+                                <a href="{{ url_for('quiz.manage_quiz', quiz_id=quiz.id) }}" class="btn btn-sm btn-primary">Manage Quiz</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
